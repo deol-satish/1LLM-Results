@@ -1,8 +1,13 @@
 # Configuration variables
 GRAPH_SAVE_FOLDER = "output/graphs/"
 DATA_SAVE_FOLDER = "output/datasets/"
-LOG_FILE_ORIGINAL = "./data/eval_logs_original.json"
-LOG_FILE_LLM = "./data/eval_logs_llm.json"
+DATA_FOLDER = ""
+# LOG_FILE_ORIGINAL = "./data/eval_logs_original.json"
+# LOG_FILE_LLM = "./data/eval_logs_llm.json"
+
+LOG_FILE_ORIGINAL = "G:/Github/1LLM-Results/results/llama3/2025-02-22/llama3_base_eval_logs_original.json"
+LOG_FILE_LLM = "G:/Github/1LLM-Results/results/llama3/2025-02-22/llama3_base_eval_logs_llm.json"
+
 SAVE_FORMATS = ['png', 'eps', 'pdf']  # Formats to save graphs
 DPI = 500
 

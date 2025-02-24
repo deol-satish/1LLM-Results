@@ -3,22 +3,27 @@ import json
 import numpy as np
 import pandas as pd
 
-def load_log_files(log_dir,model_tag):
-    """Load and parse log files."""
-    if model_tag == "Training":
-        log_files = [
-            f for f in os.listdir(log_dir)
-            if 'train' in f and f.endswith('.json')
-        ]
-    if model_tag == "Testing":
-        log_files = [
-            f for f in os.listdir(log_dir)
-            if 'test' in f and f.endswith('.json')
-        ]
-    log_files.sort(key=lambda x: int(x.split('_')[-1].split('.')[0]))
-    return log_files
+def get_latest_date_folder(base_dir):
+    """Get the latest date folder within a directory."""
+    date_folders = [f for f in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, f))]
+    latest_folder = max(date_folders, key=lambda d: d)  # Assuming ISO 8601 date format (YYYY-MM-DD)
+    return os.path.join(base_dir, latest_folder)
 
-def parse_logs(log_dir, log_files, model_tag):
+def load_log_files(log_dir, model_tag):
+    """Load and parse log files from the latest date folder."""
+    latest_folder = get_latest_date_folder(log_dir)
+
+    if model_tag == "Training":
+        log_files = [f for f in os.listdir(latest_folder) if 'train' in f and f.endswith('.json')]
+    elif model_tag == "Testing":
+        log_files = [f for f in os.listdir(latest_folder) if 'test' in f and f.endswith('.json')]
+    else:
+        raise ValueError("Invalid model_tag. Use 'Training' or 'Testing'.")
+
+    log_files.sort(key=lambda x: int(x.split('_')[-1].split('.')[0]))
+    return [os.path.join(latest_folder, f) for f in log_files]
+
+def parse_logs(log_files, model_tag):
     """Extract relevant metrics from log files."""
     epoch_numbers = []
     mean_losses, median_losses, mean_accuracies = [], [], []
@@ -37,7 +42,7 @@ def parse_logs(log_dir, log_files, model_tag):
         epoch_number = int(log_file.split('_')[-1].split('.')[0])
         epoch_numbers.append(epoch_number)
 
-        with open(os.path.join(log_dir, log_file), 'r') as file:
+        with open(log_file, 'r') as file:
             data = json.load(file)
             if model_tag == "Training":
                 losses = [step['train_loss'] for step in data['steps']]
@@ -81,7 +86,6 @@ def parse_logs(log_dir, log_files, model_tag):
     print("start_time",start_time)
     print("end_time",end_time)
 
-    print("log_dir",log_dir)
     
     print("mean_timestamps_each_step",np.median(mean_timestamps_each_step))
     print()

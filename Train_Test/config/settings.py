@@ -1,6 +1,6 @@
 # Configuration variables
 GRAPH_SAVE_FOLDER = "output/graphs/"
-DATA_FOLDER = "data"
+DATA_FOLDER = "G:/Github/1LLM-Results/results"
 SAVE_FORMATS = ['png', 'eps', 'pdf']  # Formats to save graphs
 DPI = 500
 
