@@ -2,11 +2,36 @@ import pandas as pd
 import json
 from config import COL_DICT
 import numpy as np
+import os
 
 def load_logs(log_file):
     """Load logs from a JSON file."""
     with open(log_file, 'r') as file:
         return json.load(file)
+
+def get_latest_date_folder(base_dir):
+    """Get the latest date folder within a directory."""
+    date_folders = [f for f in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, f))]
+    latest_folder = max(date_folders, key=lambda d: d)  # Assuming ISO 8601 date format (YYYY-MM-DD)
+    return os.path.join(base_dir, latest_folder)
+
+def load_log_files(log_dir, tag, freq=100):
+    """Load and parse log files from the latest date folder."""
+    latest_folder = get_latest_date_folder(log_dir)
+
+    if tag == "llm":
+        log_files = [f for f in os.listdir(latest_folder) if 'llm' in f and f.endswith('.json')]
+    elif tag == "original":
+        log_files = [f for f in os.listdir(latest_folder) if 'original' in f and f.endswith('.json')]
+    else:
+        raise ValueError("Invalid tag. Use 'LLM' or 'Original'.")
+    
+
+    # Filter log files to include only those with '100' in the filename
+    log_files = [f for f in log_files if str(freq) in f]
+
+    log_files.sort(key=lambda x: int(x.split('_')[-1].split('.')[0]))
+    return [os.path.join(latest_folder, f) for f in log_files]
 
 def extract_data(logs):
     """Extract steps, queue delays, packet lengths, and test losses from logs."""

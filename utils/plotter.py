@@ -12,43 +12,6 @@ def save_plot(fig, filename, folder):
 
 # For Train_Test
 
-# Function to plot metrics with color, marker, and linestyle cycling
-def plot_metric(df, x_column, y_columns, labels, title, xlabel, ylabel, filename, folder):
-    """Plot one or more metrics."""
-    fig, ax = plt.subplots(figsize=(6, 4), dpi=DPI)
-    
-    # Create iterators for cycling through colors, markers, and linestyles
-    color_cycle = itertools.cycle(colors)
-    marker_cycle = itertools.cycle(markers)
-    linestyle_cycle = itertools.cycle(linestyles)
-    
-    for y_column, label in zip(y_columns, labels):
-        # Get the next available color, marker, and linestyle
-        color = next(color_cycle)
-        marker = next(marker_cycle)
-        linestyle = next(linestyle_cycle)
-        
-        # Plot the line with chosen style and color
-        ax.plot(
-            df[x_column], df[y_column], 
-            label=label, 
-            color=color, 
-            marker=marker, 
-            linestyle=linestyle
-        )
-    if not title_req:
-        title = ""
-    # Set plot properties
-    ax.set(title=title, xlabel=xlabel, ylabel=ylabel)
-    ax.legend()
-    ax.grid(True)
-    
-    # Tight layout and save the plot
-    plt.tight_layout()
-    save_plot(fig, filename, folder)
-    plt.close(fig)
-
-
 # Function to plot multiple datasets for comparison
 def plot_comparison(dfs, x_column, y_column, labels, title, xlabel, ylabel, filename, folder):
     """Compare multiple datasets on a single plot."""
@@ -89,7 +52,46 @@ def plot_comparison(dfs, x_column, y_column, labels, title, xlabel, ylabel, file
     plt.close(fig)
 
 
+# Function to plot metrics with color, marker, and linestyle cycling
+def plot_metric(df, x_column, y_columns, labels, title, xlabel, ylabel, filename, folder):
+    """Plot one or more metrics."""
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=DPI)
+    
+    # Create iterators for cycling through colors, markers, and linestyles
+    color_cycle = itertools.cycle(colors)
+    marker_cycle = itertools.cycle(markers)
+    linestyle_cycle = itertools.cycle(linestyles)
+    
+    for y_column, label in zip(y_columns, labels):
+        # Get the next available color, marker, and linestyle
+        color = next(color_cycle)
+        marker = next(marker_cycle)
+        linestyle = next(linestyle_cycle)
+        
+        # Plot the line with chosen style and color
+        ax.plot(
+            df[x_column], df[y_column], 
+            label=label, 
+            color=color, 
+            marker=marker, 
+            linestyle=linestyle
+        )
+    if not title_req:
+        title = ""
+    # Set plot properties
+    ax.set(title=title, xlabel=xlabel, ylabel=ylabel)
+    ax.legend()
+    ax.grid(True)
+    
+    # Tight layout and save the plot
+    plt.tight_layout()
+    save_plot(fig, filename, folder)
+    plt.close(fig)
+
+####################################################################################################################################
 # For Evaluate
+
+markers = ['*','p','o', 's', 'D', '^', 'v', 'p', '*', 'x']
 
 def plot_line_comparison(df, columns, labels, xlabel, ylabel, title, filename, folder):
     """
