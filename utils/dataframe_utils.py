@@ -18,8 +18,7 @@ def get_all_date_folders(base_dir):
 def load_log_files(log_dir, model_tag,freq="100"):
     """Load and parse log files from all date folders, preferring the newest."""
     date_folders = get_all_date_folders(log_dir)
-    print("date folders")
-    print(date_folders)
+    print("date folders",date_folders)
     log_files = []
 
     folder = date_folders[0]
@@ -37,11 +36,12 @@ def load_log_files(log_dir, model_tag,freq="100"):
     
     # Filter log files to include only those with '100' in the filename
     log_files = [f for f in log_files if f"{freq}_eval_logs" in f]
-    # print("***"*20)
-    # print(log_files[0])
-    # print("***"*20)
+    print("***"*20)
+    print(log_files[0])
+    print("***"*20)
+    log_file = load_logs(log_files[0])
 
-    return load_logs(log_files[0])
+    return log_file
 
 
 def extract_data(logs):
@@ -162,9 +162,9 @@ def create_dataframe(steps_original, queue_delays_original, packet_lengths_origi
     cdf_df = pd.DataFrame(cdf_data)
 
     # Print summary statistics
-    print("-" * 50)
-    print("CDF DataFrame Summary:")
-    print(cdf_df.describe())
+    # print("-" * 50)
+    # print("CDF DataFrame Summary:")
+    # print(cdf_df.describe())
     
     return data, cdf_df
 

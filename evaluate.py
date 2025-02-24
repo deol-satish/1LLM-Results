@@ -26,8 +26,8 @@ for llm_tag in llm_tags:
     # Load and extract data
     original_logs = load_log_files(log_dir,"original")
     llm_logs = load_log_files(log_dir,"llm")
-    print("original_logs",original_logs)
-    print("llm_logs",llm_logs)
+    # print("original_logs",original_logs)
+    # print("llm_logs",llm_logs)
 
     steps_original, queue_delays_original, packet_lengths_original, losses_original = extract_data(original_logs)
     steps_llm, queue_delays_llm, packet_lengths_llm, losses_llm = extract_data(llm_logs)
