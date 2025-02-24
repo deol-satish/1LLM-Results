@@ -1,6 +1,6 @@
 import pandas as pd
 import json
-from config.settings import COL_DICT
+from config import COL_DICT
 import numpy as np
 
 def load_logs(log_file):
