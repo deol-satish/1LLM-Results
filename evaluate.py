@@ -1,5 +1,5 @@
 import os
-from config import GRAPH_SAVE_FOLDER, LOG_FILE_ORIGINAL, LOG_FILE_LLM
+from utils.config import GRAPH_SAVE_FOLDER, LOG_FILE_ORIGINAL, LOG_FILE_LLM
 from utils.dataframe_utils import create_dataframe,load_logs, extract_data
 from utils.plotter import plot_line_comparison, plot_box_comparison, cdf_plot_line_comparison
 

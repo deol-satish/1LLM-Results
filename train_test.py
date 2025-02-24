@@ -2,7 +2,7 @@
 import os
 from utils.data_loader import load_log_files, parse_logs
 from utils.plotter import plot_comparison
-from config import GRAPH_SAVE_FOLDER, DATA_FOLDER, SAVE_FORMATS
+from utils.config import GRAPH_SAVE_FOLDER, DATA_FOLDER, SAVE_FORMATS
 
 # llm_tags = ['opt_train', 'gpt_train', 't5llm_train', 'llama_train1', 'llama_train2', 'llama_train3']
 # label_name = "Training"
@@ -59,7 +59,7 @@ plot_comparison(
 import os
 from utils.data_loader import load_log_files, parse_logs
 from utils.plotter import plot_comparison
-from config import GRAPH_SAVE_FOLDER, DATA_FOLDER
+from utils.config import GRAPH_SAVE_FOLDER, DATA_FOLDER
 
 # llm_tags = ['opt_test', 'gpt_test', 't5llm_test','llama_test2','llama_test3']
 # label_name = "Testing"

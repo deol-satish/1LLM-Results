@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 import itertools
-from config import colors, markers, linestyles, DPI, SAVE_FORMATS, bar_width as global_bar_width , figsize as global_figsize, title_req
+from utils.config import colors, markers, linestyles, DPI, SAVE_FORMATS, bar_width as global_bar_width , figsize as global_figsize, title_req
 
 # Function to save the plot in different formats
 def save_plot(fig, filename, folder):

@@ -1,6 +1,6 @@
 import pandas as pd
 import json
-from config import COL_DICT
+from utils.config import COL_DICT
 import numpy as np
 import os
 
