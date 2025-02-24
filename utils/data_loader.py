@@ -3,25 +3,31 @@ import json
 import numpy as np
 import pandas as pd
 
-def get_latest_date_folder(base_dir):
-    """Get the latest date folder within a directory."""
+def get_all_date_folders(base_dir):
+    """Get all date folders within a directory, sorted by date (newest first)."""
     date_folders = [f for f in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, f))]
-    latest_folder = max(date_folders, key=lambda d: d)  # Assuming ISO 8601 date format (YYYY-MM-DD)
-    return os.path.join(base_dir, latest_folder)
+    date_folders.sort(reverse=True)  # Assuming ISO 8601 date format (YYYY-MM-DD)
+    return [os.path.join(base_dir, folder) for folder in date_folders]
 
 def load_log_files(log_dir, model_tag):
-    """Load and parse log files from the latest date folder."""
-    latest_folder = get_latest_date_folder(log_dir)
+    """Load and parse log files from all date folders, preferring the newest."""
+    date_folders = get_all_date_folders(log_dir)
+    log_files = {}
 
-    if model_tag == "Training":
-        log_files = [f for f in os.listdir(latest_folder) if 'train' in f and f.endswith('.json')]
-    elif model_tag == "Testing":
-        log_files = [f for f in os.listdir(latest_folder) if 'test' in f and f.endswith('.json')]
-    else:
-        raise ValueError("Invalid model_tag. Use 'Training' or 'Testing'.")
+    for folder in date_folders:
+        if model_tag == "Training":
+            current_files = [f for f in os.listdir(folder) if 'train' in f and f.endswith('.json')]
+        elif model_tag == "Testing":
+            current_files = [f for f in os.listdir(folder) if 'test' in f and f.endswith('.json')]
+        else:
+            raise ValueError("Invalid model_tag. Use 'Training' or 'Testing'.")
 
-    log_files.sort(key=lambda x: int(x.split('_')[-1].split('.')[0]))
-    return [os.path.join(latest_folder, f) for f in log_files]
+        for f in current_files:
+            epoch = int(f.split('_')[-1].split('.')[0])
+            if epoch not in log_files:
+                log_files[epoch] = os.path.join(folder, f)
+
+    return [log_files[epoch] for epoch in sorted(log_files.keys())]
 
 def parse_logs(log_files, model_tag):
     """Extract relevant metrics from log files."""

@@ -1,22 +1,34 @@
 import os
-from utils.config import GRAPH_SAVE_FOLDER, LOG_FILE_ORIGINAL, LOG_FILE_LLM
-from utils.dataframe_utils import create_dataframe,load_logs, extract_data
+from utils.config import GRAPH_SAVE_FOLDER, DATA_FOLDER
+from utils.dataframe_utils import create_dataframe,load_logs, extract_data,load_log_files
 from utils.plotter import plot_line_comparison, plot_box_comparison, cdf_plot_line_comparison
 
 
 
-model_list = ['llama3', 'llama2' , 'opt', 'gpt2', 't5']
-model_tag = "llama3"
-eval_tag = f"{model_tag}_eval_100_freq"
+
+
 # Ensure the save folders exist
+llm_tags = ['llama3', 'llama2' , 'opt', 'gpt2', 't5']
 
+label_name = "Training"
 
+# Create a list to store dataframes for comparison
+dfs = []
+labels = []
 
-for model_tag in model_list:
+for llm_tag in llm_tags:
+    # Paths
+    log_dir = os.path.join(DATA_FOLDER, llm_tag)
+    print(log_dir, label_name)
+
+    eval_tag = f"{llm_tag}_eval_100_freq"
 
     # Load and extract data
-    original_logs = load_logs(LOG_FILE_ORIGINAL)
-    llm_logs = load_logs(LOG_FILE_LLM)
+    original_logs = load_log_files(log_dir,"original")
+    llm_logs = load_log_files(log_dir,"llm")
+    print("original_logs",original_logs)
+    print("llm_logs",llm_logs)
+
     steps_original, queue_delays_original, packet_lengths_original, losses_original = extract_data(original_logs)
     steps_llm, queue_delays_llm, packet_lengths_llm, losses_llm = extract_data(llm_logs)
 
@@ -40,7 +52,7 @@ for model_tag in model_list:
         labels=['Traditional L4S', 'L4S-LLM'],
         xlabel='Step Number',
         ylabel='Queue Delay (s)',
-        title=f'Queue Delay Comparison: Traditional vs {model_tag}',
+        title=f'Queue Delay Comparison: Traditional vs {llm_tag}',
         filename=f"{eval_tag}_queue_delay_comparison",
         folder=tagged_folder
     )
@@ -51,7 +63,7 @@ for model_tag in model_list:
         columns=['Original Queue Delay', 'LLM Queue Delay'],
         labels=['Traditional L4S', 'L4S-LLM AQM'],
         ylabel='Queue Delay (s)',
-        title=f'Queue Delay Comparison (Box Plot): Traditional vs {model_tag}',
+        title=f'Queue Delay Comparison (Box Plot): Traditional vs {llm_tag}',
         filename=f"{eval_tag}_queue_delay_box_comparison",
         folder=tagged_folder
     )
@@ -65,7 +77,7 @@ for model_tag in model_list:
         labels=['Traditional L4S', 'L4S-LLM AQM'],
         xlabel='Step Number',
         ylabel='Packet Length (Mbit/s)',
-        title=f'Packet Length Comparison: Traditional vs {model_tag}',
+        title=f'Packet Length Comparison: Traditional vs {llm_tag}',
         filename=f"{eval_tag}_throughput_comparison",
         folder=tagged_folder
     )
@@ -76,7 +88,7 @@ for model_tag in model_list:
         columns=['Original Packet Length', 'LLM Throughput'],
         labels=['Traditional L4S', 'L4S-LLM AQM'],
         ylabel='Packet Length (Mbit/s)',
-        title=f'Packet Length Comparison (Box Plot): Traditional vs {model_tag}',
+        title=f'Packet Length Comparison (Box Plot): Traditional vs {llm_tag}',
         filename=f"{eval_tag}_throughput_box_comparison",
         folder=tagged_folder
     )
@@ -88,7 +100,7 @@ for model_tag in model_list:
         labels=['Traditional L4S', 'L4S-LLM AQM'],
         xlabel='Step Number',
         ylabel='Bandwidth Utilisation (Mbit/s)',
-        title=f'Throughput Comparison: Traditional vs {model_tag}',
+        title=f'Throughput Comparison: Traditional vs {llm_tag}',
         filename=f"{eval_tag}_throughput_comparison",
         folder=tagged_folder
     )
@@ -99,7 +111,7 @@ for model_tag in model_list:
         columns=['Original Throughput', 'LLM Throughput'],
         labels=['Traditional L4S', 'L4S-LLM AQM'],
         ylabel='Bandwidth Utilisation (Mbit/s)',
-        title=f'Bandwidth Utilisation Comparison (Box Plot): Traditional vs {model_tag}',
+        title=f'Bandwidth Utilisation Comparison (Box Plot): Traditional vs {llm_tag}',
         filename=f"{eval_tag}_throughput_box_comparison",
         folder=tagged_folder
     )

@@ -9,29 +9,40 @@ def load_logs(log_file):
     with open(log_file, 'r') as file:
         return json.load(file)
 
-def get_latest_date_folder(base_dir):
-    """Get the latest date folder within a directory."""
+def get_all_date_folders(base_dir):
+    """Get all date folders within a directory, sorted by date (newest first)."""
     date_folders = [f for f in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, f))]
-    latest_folder = max(date_folders, key=lambda d: d)  # Assuming ISO 8601 date format (YYYY-MM-DD)
-    return os.path.join(base_dir, latest_folder)
+    date_folders.sort(reverse=True)  # Assuming ISO 8601 date format (YYYY-MM-DD)
+    return [os.path.join(base_dir, folder) for folder in date_folders]
 
-def load_log_files(log_dir, tag, freq=100):
-    """Load and parse log files from the latest date folder."""
-    latest_folder = get_latest_date_folder(log_dir)
+def load_log_files(log_dir, model_tag,freq="100"):
+    """Load and parse log files from all date folders, preferring the newest."""
+    date_folders = get_all_date_folders(log_dir)
+    print("date folders")
+    print(date_folders)
+    log_files = []
 
-    if tag == "llm":
-        log_files = [f for f in os.listdir(latest_folder) if 'llm' in f and f.endswith('.json')]
-    elif tag == "original":
-        log_files = [f for f in os.listdir(latest_folder) if 'original' in f and f.endswith('.json')]
+    folder = date_folders[0]
+    if model_tag == "llm":
+        current_files = [f for f in os.listdir(folder) if 'eval_logs_llm' in f and f.endswith('.json')]
+    elif model_tag == "original":
+        current_files = [f for f in os.listdir(folder) if 'eval_logs_original' in f and f.endswith('.json')]
     else:
-        raise ValueError("Invalid tag. Use 'LLM' or 'Original'.")
+        raise ValueError("Invalid model_tag. Use 'Training' or 'Testing'.")
     
 
-    # Filter log files to include only those with '100' in the filename
-    log_files = [f for f in log_files if str(freq) in f]
 
-    log_files.sort(key=lambda x: int(x.split('_')[-1].split('.')[0]))
-    return [os.path.join(latest_folder, f) for f in log_files]
+    for f in current_files:
+        log_files.append(os.path.join(folder,f))
+    
+    # Filter log files to include only those with '100' in the filename
+    log_files = [f for f in log_files if f"{freq}_eval_logs" in f]
+    # print("***"*20)
+    # print(log_files[0])
+    # print("***"*20)
+
+    return load_logs(log_files[0])
+
 
 def extract_data(logs):
     """Extract steps, queue delays, packet lengths, and test losses from logs."""
