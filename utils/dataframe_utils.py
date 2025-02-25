@@ -15,7 +15,7 @@ def get_all_date_folders(base_dir):
     date_folders.sort(reverse=True)  # Assuming ISO 8601 date format (YYYY-MM-DD)
     return [os.path.join(base_dir, folder) for folder in date_folders]
 
-def load_log_files(log_dir, model_tag,freq="100"):
+def load_log_files(log_dir, model_tag,freq="10"):
     """Load and parse log files from all date folders, preferring the newest."""
     date_folders = get_all_date_folders(log_dir)
     print("date folders",date_folders)
@@ -37,8 +37,8 @@ def load_log_files(log_dir, model_tag,freq="100"):
     # Filter log files to include only those with '100' in the filename
     log_files = [f for f in log_files if f"{freq}_eval_logs" in f]
     print("***"*20)
-    print(log_files[0])
-    print("***"*20)
+    print("model_tag",model_tag)
+    print(log_files)
     log_file = load_logs(log_files[0])
 
     return log_file
@@ -128,7 +128,7 @@ def create_dataframe(steps_original, queue_delays_original, packet_lengths_origi
     data['LLM Throughput'] = data['LLM Packet Length'] / data['LLM Queue Delay']
 
     # print(data['Original Throughput'].describe())
-    # print(data['LLM Throughput'].describe())
+    print(data['LLM Throughput'].describe())
     # print("|||||----" * 50)
     # print("|||||----" * 50)
     # print("|||||----" * 50)
@@ -165,6 +165,14 @@ def create_dataframe(steps_original, queue_delays_original, packet_lengths_origi
     # print("-" * 50)
     # print("CDF DataFrame Summary:")
     # print(cdf_df.describe())
+
+    import matplotlib.pyplot as plt
+
+    print(len(data.index))
+    print(data['LLM Queue Delay'])
+    # plt.plot(data.index, data['LLM Queue Delay'])
+    plt.plot(data.index, data['LLM Throughput'], marker ='*')
+    plt.show()
     
     return data, cdf_df
 

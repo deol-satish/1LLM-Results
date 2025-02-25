@@ -15,17 +15,18 @@ label_name = "Training"
 # Create a list to store dataframes for comparison
 dfs = []
 labels = []
+llmfreq = 10
 
 for llm_tag in llm_tags:
     # Paths
     log_dir = os.path.join(DATA_FOLDER, llm_tag)
     print(log_dir, label_name)
 
-    eval_tag = f"{llm_tag}_eval_100_freq"
+    eval_tag = f"{llm_tag}_eval_{llmfreq}_freq"
 
     # Load and extract data
-    original_logs = load_log_files(log_dir,"original")
-    llm_logs = load_log_files(log_dir,"llm")
+    original_logs = load_log_files(log_dir,"original",llmfreq)
+    llm_logs = load_log_files(log_dir,"llm",llmfreq)
     # print("original_logs",original_logs)
     # print("llm_logs",llm_logs)
 
