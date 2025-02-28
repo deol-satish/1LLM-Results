@@ -8,14 +8,15 @@ from utils.plotter import plot_line_comparison, plot_box_comparison, cdf_plot_li
 
 
 # Ensure the save folders exist
-llm_tags = ['llama3', 'llama2' , 'opt', 'gpt2', 't5']
+# llm_tags = ['llama3', 'llama2' , 'opt', 'gpt2', 't5']
+llm_tags = ['llama3']
 
 label_name = "Training"
 
 # Create a list to store dataframes for comparison
 dfs = []
 labels = []
-llmfreq = 10
+llmfreq = 100
 
 for llm_tag in llm_tags:
     # Paths

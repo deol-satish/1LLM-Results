@@ -48,10 +48,16 @@ def extract_data(logs):
     """Extract steps, queue delays, packet lengths, and test losses from logs."""
     steps, queue_delays, packet_lengths, losses = [], [], [], []
     for step_log in logs['steps']:
-        steps.append(step_log['step'])
-        queue_delays.append(step_log['states'][0][0][COL_DICT['current_queue_delay']])
-        packet_lengths.append(step_log['states'][0][0][COL_DICT['packet_length']])
-        losses.append(step_log['test_loss'])
+        # print("step_log['states'][0][0][COL_DICT['current_queue_delay']]",step_log['states'][0][0][COL_DICT['current_queue_delay']])
+        # print("step_log['labels']",step_log['labels'])
+        if step_log['labels'][0][0] == 1:
+            print("===============34826482374682376428374678623816238")
+        if step_log['labels'][0][0] == 0 or step_log['labels'][0][0] == 2:
+            steps.append(step_log['step'])
+            queue_delays.append(step_log['states'][0][0][COL_DICT['current_queue_delay']])
+            packet_lengths.append(step_log['states'][0][0][COL_DICT['packet_length']])
+            losses.append(step_log['test_loss'])
+            # print(step_log['returns'][0][0][0])
     return steps, queue_delays, packet_lengths, losses
 
 def return_extract_data(logs):
@@ -59,12 +65,14 @@ def return_extract_data(logs):
     steps, queue_delays, packet_lengths, losses = [], [], [], []
     returns = []
     for step_log in logs['steps']:
-        steps.append(step_log['step'])
-        queue_delays.append(step_log['states'][0][0][COL_DICT['current_queue_delay']])
-        packet_lengths.append(step_log['states'][0][0][COL_DICT['packet_length']])
-        losses.append(step_log['test_loss'])
-        returns.append(step_log['returns'][0][0][0])
-        # print(step_log['returns'][0][0][0])
+        if step_log['labels'] == 0 and step_log['labels'] == 2:
+            print("step_log['states'][0][0][COL_DICT['current_queue_delay']]",step_log['states'][0][0][COL_DICT['current_queue_delay']])
+            steps.append(step_log['step'])
+            queue_delays.append(step_log['states'][0][0][COL_DICT['current_queue_delay']])
+            packet_lengths.append(step_log['states'][0][0][COL_DICT['packet_length']])
+            losses.append(step_log['test_loss'])
+            returns.append(step_log['returns'][0][0][0])
+            # print(step_log['returns'][0][0][0])
     return steps, queue_delays, packet_lengths, losses, returns
 
 import numpy as np
@@ -98,20 +106,29 @@ def create_dataframe(steps_original, queue_delays_original, packet_lengths_origi
     # print(data['Original Packet Length'].describe())
     # print(data['LLM Packet Length'].describe())
 
-    # print("|||||----" * 50)
+    print("|||||----" * 50)
+    print(data['Original Queue Delay'].describe())
+    print(data['LLM Queue Delay'].describe())
 
+    print("Original queue delay median",data['Original Queue Delay'].median())
+    print("LLM queue delay median",data['LLM Queue Delay'].median())
+
+    print("Original queue delay mean",data['Original Queue Delay'].mean())
+    print("LLM queue delay mean",data['LLM Queue Delay'].mean())
+
+    # Converting into bits from bytes
     data['LLM Packet Length'] = data['LLM Packet Length'] * 8
     data['Original Packet Length'] = data['Original Packet Length'] * 8
-    # Add a base queue delay of 1 ms (1e6 nanoseconds)
-    base_queue_delay_ns = 1e4
+    # Add a base queue delay of 1 ms (1e6 microseconds)
+    base_queue_delay_ns = 1e3
     data['Original Queue Delay'] += base_queue_delay_ns
     data['LLM Queue Delay'] += base_queue_delay_ns
 
-    # Convert queue delay from nanoseconds to seconds
+    # Convert queue delay from microseconds to seconds
     data['Original Queue Delay'] = data['Original Queue Delay'] / 1e6
     data['LLM Queue Delay'] = data['LLM Queue Delay'] / 1e6
 
-    # Convert packet length from bytes to MB
+    # Convert packet length from normal bit/bytes to Mb/b
     data['Original Packet Length'] = data['Original Packet Length'] / (1024 * 1034)
     data['LLM Packet Length'] = data['LLM Packet Length'] / (1024 * 1034)
 
@@ -128,7 +145,7 @@ def create_dataframe(steps_original, queue_delays_original, packet_lengths_origi
     data['LLM Throughput'] = data['LLM Packet Length'] / data['LLM Queue Delay']
 
     # print(data['Original Throughput'].describe())
-    print(data['LLM Throughput'].describe())
+    print(data['LLM Queue Delay'].describe())
     # print("|||||----" * 50)
     # print("|||||----" * 50)
     # print("|||||----" * 50)
@@ -168,11 +185,11 @@ def create_dataframe(steps_original, queue_delays_original, packet_lengths_origi
 
     import matplotlib.pyplot as plt
 
-    print(len(data.index))
-    print(data['LLM Queue Delay'])
-    # plt.plot(data.index, data['LLM Queue Delay'])
-    plt.plot(data.index, data['LLM Throughput'], marker ='*')
-    plt.show()
+    # print(len(data.index))
+    # print(data['LLM Queue Delay'])
+    # # plt.plot(data.index, data['LLM Queue Delay'])
+    # plt.plot(data.index, data['LLM Throughput'], marker ='*')
+    # plt.show()
     
     return data, cdf_df
 
