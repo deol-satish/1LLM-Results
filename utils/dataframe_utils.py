@@ -107,20 +107,20 @@ def create_dataframe(steps_original, queue_delays_original, packet_lengths_origi
     # print(data['LLM Packet Length'].describe())
 
     print("|||||----" * 50)
-    print(data['Original Queue Delay'].describe())
-    print(data['LLM Queue Delay'].describe())
+    # print(data['Original Queue Delay'].describe())
+    # print(data['LLM Queue Delay'].describe())
 
-    print("Original queue delay median",data['Original Queue Delay'].median())
-    print("LLM queue delay median",data['LLM Queue Delay'].median())
+    print("Original queue delay(ms) median",data['Original Queue Delay'].median()/1000)
+    print("LLM queue delay(ms) median",data['LLM Queue Delay'].median()/1000)
 
-    print("Original queue delay mean",data['Original Queue Delay'].mean())
-    print("LLM queue delay mean",data['LLM Queue Delay'].mean())
+    print("Original queue delay(ms) mean",data['Original Queue Delay'].mean()/1000)
+    print("LLM queue delay(ms) mean",data['LLM Queue Delay'].mean()/1000)
 
     # Converting into bits from bytes
     data['LLM Packet Length'] = data['LLM Packet Length'] * 8
     data['Original Packet Length'] = data['Original Packet Length'] * 8
     # Add a base queue delay of 1 ms (1e6 microseconds)
-    base_queue_delay_ns = 1e3
+    base_queue_delay_ns = 1e4
     data['Original Queue Delay'] += base_queue_delay_ns
     data['LLM Queue Delay'] += base_queue_delay_ns
 
@@ -144,8 +144,29 @@ def create_dataframe(steps_original, queue_delays_original, packet_lengths_origi
     data['Original Throughput'] = data['Original Packet Length'] / data['Original Queue Delay']
     data['LLM Throughput'] = data['LLM Packet Length'] / data['LLM Queue Delay']
 
+    print("Original Throughput median",data['Original Throughput'].median())
+    print("LLM Throughput  median",data['LLM Throughput'].median())
+
+    print("Original Throughput mean",data['Original Throughput'].mean())
+    print("LLM Throughput mean",data['LLM Throughput'].mean())
+
+    print("addedd 1ms to queue delay for thrpt calculation purposes")
+
+    print("Original queue delay(ms) median",data['Original Queue Delay'].median()*1000)
+    print("LLM queue delay(ms) median",data['LLM Queue Delay'].median()*1000)
+
+    print("Original queue delay(ms) mean",data['Original Queue Delay'].mean()*1000)
+    print("LLM queue delay(ms) mean",data['LLM Queue Delay'].mean()*1000)
+
+
+    print("Original Total Data Sent",data['Original Packet Length'].sum())
+    print("LLM Total Data Sent",data['LLM Packet Length'].sum())
+
+
+
+
     # print(data['Original Throughput'].describe())
-    print(data['LLM Queue Delay'].describe())
+    # print(data['LLM Queue Delay'].describe())
     # print("|||||----" * 50)
     # print("|||||----" * 50)
     # print("|||||----" * 50)

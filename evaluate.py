@@ -16,7 +16,7 @@ label_name = "Training"
 # Create a list to store dataframes for comparison
 dfs = []
 labels = []
-llmfreq = 100
+llmfreq = 50
 
 for llm_tag in llm_tags:
     # Paths
@@ -78,20 +78,20 @@ for llm_tag in llm_tags:
         columns=['Original Packet Length', 'LLM Packet Length'],
         labels=['Traditional L4S', 'L4S-LLM AQM'],
         xlabel='Step Number',
-        ylabel='Packet Length (Mbit/s)',
+        ylabel='Packet Length (Mbit)',
         title=f'Packet Length Comparison: Traditional vs {llm_tag}',
-        filename=f"{eval_tag}_throughput_comparison",
+        filename=f"{eval_tag}_pkt_len_comparison",
         folder=tagged_folder
     )
 
     # Plot throughput box plot comparison using the updated box plot function
     plot_box_comparison(
         df,
-        columns=['Original Packet Length', 'LLM Throughput'],
+        columns=['Original Packet Length', 'LLM Packet Length'],
         labels=['Traditional L4S', 'L4S-LLM AQM'],
-        ylabel='Packet Length (Mbit/s)',
+        ylabel='Packet Length (Mbit)',
         title=f'Packet Length Comparison (Box Plot): Traditional vs {llm_tag}',
-        filename=f"{eval_tag}_throughput_box_comparison",
+        filename=f"{eval_tag}_box_pkt_len_comparison",
         folder=tagged_folder
     )
 
