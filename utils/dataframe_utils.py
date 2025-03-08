@@ -35,6 +35,7 @@ def load_log_files(log_dir, model_tag,freq="10"):
         log_files.append(os.path.join(folder,f))
     
     # Filter log files to include only those with '100' in the filename
+    print("log_files",log_files)
     log_files = [f for f in log_files if f"{freq}_eval_logs" in f]
     print("***"*20)
     print("model_tag",model_tag)
@@ -47,7 +48,15 @@ def load_log_files(log_dir, model_tag,freq="10"):
 def extract_data(logs):
     """Extract steps, queue delays, packet lengths, and test losses from logs."""
     steps, queue_delays, packet_lengths, losses = [], [], [], []
+    classic_count = 0
+    l4s_count = 0
     for step_log in logs['steps']:
+        queue_type = step_log['states'][0][0][COL_DICT['queue_type']]
+        # print("step_log['states'][0][0][COL_DICT['queue_type']]",step_log['states'][0][0][COL_DICT['queue_type']])
+        if queue_type == 0:
+            classic_count += 1
+        if queue_type == 1:
+            l4s_count += 1
         # print("step_log['states'][0][0][COL_DICT['current_queue_delay']]",step_log['states'][0][0][COL_DICT['current_queue_delay']])
         # print("step_log['labels']",step_log['labels'])
         if step_log['labels'][0][0] == 1:
@@ -58,6 +67,8 @@ def extract_data(logs):
             packet_lengths.append(step_log['states'][0][0][COL_DICT['packet_length']])
             losses.append(step_log['test_loss'])
             # print(step_log['returns'][0][0][0])
+    print("classic_count",classic_count)
+    print("l4s_count",l4s_count)
     return steps, queue_delays, packet_lengths, losses
 
 def return_extract_data(logs):
@@ -65,6 +76,8 @@ def return_extract_data(logs):
     steps, queue_delays, packet_lengths, losses = [], [], [], []
     returns = []
     for step_log in logs['steps']:
+        queue_type = step_log['states'][0][0][COL_DICT['queue_type']]
+        print("step_log['states'][0][0][COL_DICT['queue_type']]",step_log['states'][0][0][COL_DICT['queue_type']])
         if step_log['labels'] == 0 and step_log['labels'] == 2:
             print("step_log['states'][0][0][COL_DICT['current_queue_delay']]",step_log['states'][0][0][COL_DICT['current_queue_delay']])
             steps.append(step_log['step'])
@@ -120,7 +133,7 @@ def create_dataframe(steps_original, queue_delays_original, packet_lengths_origi
     data['LLM Packet Length'] = data['LLM Packet Length'] * 8
     data['Original Packet Length'] = data['Original Packet Length'] * 8
     # Add a base queue delay of 1 ms (1e6 microseconds)
-    base_queue_delay_ns = 1e4
+    base_queue_delay_ns = 1e3
     data['Original Queue Delay'] += base_queue_delay_ns
     data['LLM Queue Delay'] += base_queue_delay_ns
 
