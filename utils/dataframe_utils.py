@@ -3,6 +3,7 @@ import json
 from utils.config import COL_DICT
 import numpy as np
 import os
+from datetime import datetime
 
 def load_logs(log_file):
     """Load logs from a JSON file."""
@@ -12,40 +13,72 @@ def load_logs(log_file):
 def get_all_date_folders(base_dir):
     """Get all date folders within a directory, sorted by date (newest first)."""
     date_folders = [f for f in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, f))]
-    date_folders.sort(reverse=True)  # Assuming ISO 8601 date format (YYYY-MM-DD)
+    # Assumes ISO 8601 date format (YYYY-MM-DD)
+    date_folders.sort(reverse=True)
     return [os.path.join(base_dir, folder) for folder in date_folders]
 
-def load_log_files(log_dir, model_tag,freq="10"):
-    """Load and parse log files from all date folders, preferring the newest."""
+def load_log_files(log_dir, model_tag, freq="10"):
+    """Load and parse log files from all date folders, sorted by date (newest first)."""
     date_folders = get_all_date_folders(log_dir)
-    print("date folders",date_folders)
     log_files = []
 
-    folder = date_folders[0]
-    if model_tag == "llm":
-        current_files = [f for f in os.listdir(folder) if 'eval_logs_llm' in f and f.endswith('.json')]
-    elif model_tag == "original":
-        current_files = [f for f in os.listdir(folder) if 'eval_logs_original' in f and f.endswith('.json')]
-    else:
-        raise ValueError("Invalid model_tag. Use 'Training' or 'Testing'.")
-    
+    for folder in date_folders:
+        try:
+            all_files = os.listdir(folder)
+        except FileNotFoundError:
+            continue  # Skip if folder was removed or inaccessible
 
+        if model_tag == "llm":
+            matching_files = [f for f in all_files if f"eval_logs_llm" in f and f"{freq}_eval_logs" in f and f.endswith('.json')]
+        elif model_tag == "original":
+            matching_files = [f for f in all_files if f"eval_logs_original" in f and f"{freq}_eval_logs" in f and f.endswith('.json')]
+        else:
+            raise ValueError("Invalid model_tag. Use 'llm' or 'original'.")
 
-    for f in current_files:
-        log_files.append(os.path.join(folder,f))
-    
-    # Filter log files to include only those with '100' in the filename
-    print("log_files",log_files)
-    log_files = [f for f in log_files if f"{freq}_eval_logs" in f]
-    print("***"*20)
-    print("model_tag",model_tag)
-    print(log_files)
+        log_files.extend([os.path.join(folder, f) for f in matching_files])
+
+    if not log_files:
+        raise FileNotFoundError(f"No matching log files found for model_tag='{model_tag}' and freq='{freq}'")
+
+    # Load the most recent log file
+    print("Filtered and sorted log files:", log_files)
+    print("Loading log file (first in list):", log_files[0])
     log_file = load_logs(log_files[0])
 
     return log_file
 
 
+
 def extract_data(logs):
+    """Extract steps, queue delays, packet lengths, and test losses from logs."""
+    steps, queue_delays, packet_lengths, losses = [], [], [], []
+    classic_count = 0
+    l4s_count = 0
+    print("Total steps",len(logs['steps']))
+    for step_log in logs['steps']:
+        queue_type = step_log['states'][0][0][COL_DICT['queue_type']]
+        # print("step_log['states'][0][0][COL_DICT['queue_type']]",step_log['states'][0][0][COL_DICT['queue_type']])
+        if queue_type == 0:
+            classic_count += 1
+        if queue_type == 1:
+            l4s_count += 1
+        # print("step_log['states'][0][0][COL_DICT['current_queue_delay']]",step_log['states'][0][0][COL_DICT['current_queue_delay']])
+        # print("step_log['labels']",step_log['labels'])
+        if step_log['labels'][0][0] == 1 or step_log['labels'][0][0] == 2:            
+            print("===============34826482374682376428374678623816238")
+        if step_log['labels'][0][0] == 0 or step_log['labels'][0][0] == 2:
+            steps.append(step_log['step'])
+            queue_delays.append(step_log['states'][0][0][COL_DICT['current_queue_delay']])
+            packet_lengths.append(step_log['states'][0][0][COL_DICT['packet_length']])
+            losses.append(step_log['test_loss'])
+            # print(step_log['returns'][0][0][0])
+    print("classic_count",classic_count)
+    print("l4s_count",l4s_count)
+    print("Total steps",len(logs['steps']))
+    return steps, queue_delays, packet_lengths, losses
+
+
+def extract_data_classic(logs):
     """Extract steps, queue delays, packet lengths, and test losses from logs."""
     steps, queue_delays, packet_lengths, losses = [], [], [], []
     classic_count = 0
@@ -59,9 +92,9 @@ def extract_data(logs):
             l4s_count += 1
         # print("step_log['states'][0][0][COL_DICT['current_queue_delay']]",step_log['states'][0][0][COL_DICT['current_queue_delay']])
         # print("step_log['labels']",step_log['labels'])
-        if step_log['labels'][0][0] == 1:
+        if step_log['labels'][0][0] == 1 or step_log['labels'][0][0] == 2:            
             print("===============34826482374682376428374678623816238")
-        if step_log['labels'][0][0] == 0 or step_log['labels'][0][0] == 2:
+        if queue_type == 0 and (step_log['labels'][0][0] == 0 or step_log['labels'][0][0] == 2):
             steps.append(step_log['step'])
             queue_delays.append(step_log['states'][0][0][COL_DICT['current_queue_delay']])
             packet_lengths.append(step_log['states'][0][0][COL_DICT['packet_length']])
@@ -69,6 +102,37 @@ def extract_data(logs):
             # print(step_log['returns'][0][0][0])
     print("classic_count",classic_count)
     print("l4s_count",l4s_count)
+    print("Total steps",len(logs['steps']))
+    return steps, queue_delays, packet_lengths, losses
+
+
+def extract_data_l4s(logs):
+    """Extract steps, queue delays, packet lengths, and test losses from logs."""
+    steps, queue_delays, packet_lengths, losses = [], [], [], []
+    classic_count = 0
+    l4s_count = 0
+    for step_log in logs['steps']:
+        queue_type = step_log['states'][0][0][COL_DICT['queue_type']]
+        # print("step_log['states'][0][0][COL_DICT['queue_type']]",step_log['states'][0][0][COL_DICT['queue_type']])
+        if queue_type == 0:
+            classic_count += 1
+        if queue_type == 1:
+            l4s_count += 1
+        # print("step_log['states'][0][0][COL_DICT['current_queue_delay']]",step_log['states'][0][0][COL_DICT['current_queue_delay']])
+        # print("step_log['labels']",step_log['labels'])
+        if step_log['labels'][0][0] == 1 or step_log['labels'][0][0] == 2:            
+            print("===============34826482374682376428374678623816238")
+        # else:
+        #     print("***************34826482374682376428374678623816238")
+        if queue_type == 1 and (step_log['labels'][0][0] == 0 or step_log['labels'][0][0] == 2):
+            steps.append(step_log['step'])
+            queue_delays.append(step_log['states'][0][0][COL_DICT['current_queue_delay']])
+            packet_lengths.append(step_log['states'][0][0][COL_DICT['packet_length']])
+            losses.append(step_log['test_loss'])
+            # print(step_log['returns'][0][0][0])
+    print("classic_count",classic_count)
+    print("l4s_count",l4s_count)
+    print("Total steps",len(logs['steps']))
     return steps, queue_delays, packet_lengths, losses
 
 def return_extract_data(logs):
