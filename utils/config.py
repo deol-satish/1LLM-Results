@@ -4,8 +4,8 @@
 GRAPH_SAVE_FOLDER = "graphs/"
 # LOG_FILE_ORIGINAL = "G:/Github/1LLM-Results/results/llama3/2025-02-22/llama3_base_eval_logs_original.json"
 # LOG_FILE_LLM = "G:/Github/1LLM-Results/results/llama3/2025-02-22/llama3_base_eval_logs_llm.json"
-DATA_FOLDER = "G:/Work/Github/1LLM-Results/results"
-# DATA_FOLDER = "d:/Deol Satish/Github/1LLM-Results/results/"
+# DATA_FOLDER = "G:/Work/Github/1LLM-Results/results"
+DATA_FOLDER = "d:/Deol Satish/Github/1LLM-Results/results_test/"
 
 
 SAVE_FORMATS = ['png', 'eps', 'pdf']  # Formats to save graphs
