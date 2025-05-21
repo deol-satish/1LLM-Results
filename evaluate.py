@@ -9,14 +9,16 @@ from utils.plotter import plot_line_comparison, plot_box_comparison, cdf_plot_li
 
 # Ensure the save folders exist
 # llm_tags = ['llama3', 'llama2' , 'opt', 'gpt2', 't5']
-llm_tags = ['llama2']
+llm_tags = ['llama3']
 
 label_name = "Training"
+
+extra_tag = "new_eval"
 
 # Create a list to store dataframes for comparison
 dfs = []
 labels = []
-llmfreq = 10
+llmfreq = 100
 
 for llm_tag in llm_tags:
     # Paths
@@ -55,7 +57,7 @@ for llm_tag in llm_tags:
         xlabel='Step Number',
         ylabel='Queue Delay (s)',
         title=f'Queue Delay Comparison: Traditional vs {llm_tag}',
-        filename=f"{eval_tag}_queue_delay_comparison",
+        filename=f"{eval_tag}_queue_delay_comparison_{extra_tag}",
         folder=tagged_folder
     )
 
@@ -66,7 +68,7 @@ for llm_tag in llm_tags:
         labels=['Traditional L4S', 'L4S-LLM AQM'],
         ylabel='Queue Delay (s)',
         title=f'Queue Delay Comparison (Box Plot): Traditional vs {llm_tag}',
-        filename=f"{eval_tag}_queue_delay_box_comparison",
+        filename=f"{eval_tag}_queue_delay_box_comparison_{extra_tag}",
         folder=tagged_folder
     )
 
@@ -80,7 +82,7 @@ for llm_tag in llm_tags:
         xlabel='Step Number',
         ylabel='Packet Length (Mbit)',
         title=f'Packet Length Comparison: Traditional vs {llm_tag}',
-        filename=f"{eval_tag}_pkt_len_comparison",
+        filename=f"{eval_tag}_pkt_len_comparison_{extra_tag}",
         folder=tagged_folder
     )
 
@@ -91,7 +93,7 @@ for llm_tag in llm_tags:
         labels=['Traditional L4S', 'L4S-LLM AQM'],
         ylabel='Packet Length (Mbit)',
         title=f'Packet Length Comparison (Box Plot): Traditional vs {llm_tag}',
-        filename=f"{eval_tag}_box_pkt_len_comparison",
+        filename=f"{eval_tag}_box_pkt_len_comparison_{extra_tag}",
         folder=tagged_folder
     )
 
@@ -103,7 +105,7 @@ for llm_tag in llm_tags:
         xlabel='Step Number',
         ylabel='Bandwidth Utilisation (Mbit/s)',
         title=f'Throughput Comparison: Traditional vs {llm_tag}',
-        filename=f"{eval_tag}_throughput_comparison",
+        filename=f"{eval_tag}_throughput_comparison_{extra_tag}",
         folder=tagged_folder
     )
 
@@ -114,7 +116,7 @@ for llm_tag in llm_tags:
         labels=['Traditional L4S', 'L4S-LLM AQM'],
         ylabel='Bandwidth Utilisation (Mbit/s)',
         title=f'Bandwidth Utilisation Comparison (Box Plot): Traditional vs {llm_tag}',
-        filename=f"{eval_tag}_throughput_box_comparison",
+        filename=f"{eval_tag}_throughput_box_comparison_{extra_tag}",
         folder=tagged_folder
     )
 
@@ -129,7 +131,7 @@ for llm_tag in llm_tags:
         xlabel='Bandwidth Utilisation (Mbps)',
         ylabel='CDF',
         title='Bandwidth Utilisation CDF Comparison',
-        filename=f"{eval_tag}_throughput_cdf_comparison",
+        filename=f"{eval_tag}_throughput_cdf_comparison_{extra_tag}",
         folder=tagged_folder
     )
 
@@ -142,7 +144,7 @@ for llm_tag in llm_tags:
         xlabel='Queue Delay (s)',
         ylabel='CDF',
         title='Queue Delay CDF Comparison',
-        filename=f"{eval_tag}_queue_delay_cdf_comparison",
+        filename=f"{eval_tag}_queue_delay_cdf_comparison_{extra_tag}",
         folder=tagged_folder
     )
 

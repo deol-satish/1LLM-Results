@@ -138,8 +138,8 @@ def create_dataframe(steps_original, queue_delays_original, packet_lengths_origi
     # Converting into bits from bytes
     data['LLM Packet Length'] = data['LLM Packet Length'] * 8
     data['Original Packet Length'] = data['Original Packet Length'] * 8
-    # Add a base queue delay of 1 ms (1e6 microseconds)
-    base_queue_delay_ns = 1e3
+    # Add a base queue delay of 1 ms (1e3 microseconds)
+    base_queue_delay_ns = 1000
     data['Original Queue Delay'] += base_queue_delay_ns
     data['LLM Queue Delay'] += base_queue_delay_ns
 
